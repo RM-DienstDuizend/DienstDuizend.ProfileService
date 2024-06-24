@@ -16,8 +16,8 @@ jobs:
         shell: bash
 
     env:
-      DIRECTORY_NAME: DienstDuizend.BusinessCatalogueService
-      IMAGE_NAME: business-catalogue-service
+      DIRECTORY_NAME: DienstDuizend.ProfileService
+      IMAGE_NAME: profile-service
       
     steps:
     - uses: actions/checkout@v4
@@ -55,15 +55,17 @@ jobs:
     - name: SonarCloud Scan
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        SONAR_PROJECT_KEY: "RM-DienstDuizend_DienstDuizend.BusinessCatalogueService"
+        SONAR_PROJECT_KEY: "RM-DienstDuizend_DienstDuizend.ProfileService"
       run: |
         dotnet tool install --global dotnet-sonarscanner
         dotnet tool install --global dotnet-coverage
         export PATH="$PATH:/home/runner/.dotnet/tools"
-        dotnet sonarscanner begin /k:"${SONAR_PROJECT_KEY}" /o:"rm-dienstduizend" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.login="${SONAR_TOKEN}"
+        dotnet sonarscanner begin /k:"${SONAR_PROJECT_KEY}" /o:"rm-dienstduizend" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml /d:sonar.login="${SONAR_TOKEN}"
         dotnet build --no-restore --configuration Release
         dotnet-coverage collect "dotnet test" -f xml -o "coverage.xml"
         dotnet sonarscanner end /d:sonar.login="${SONAR_TOKEN}"
+
+
 
     - name: Run Trivy vulnerability scan
       uses: aquasecurity/trivy-action@master
